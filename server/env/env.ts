@@ -4,7 +4,7 @@ import { envSchema } from "./env-schema.js";
 try {
   await import("dotenv/config");
   console.log("Imported .env file");
-} catch {}
+} catch { /* empty */ }
 
 const parsedEnv = envSchema.safeParse(process.env);
 if (!parsedEnv.success) {
