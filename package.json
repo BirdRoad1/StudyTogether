@@ -1,0 +1,25 @@
+{
+  "name": "groupstudy",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx --watch src/index.ts"
+  },
+  "type": "module",
+  "repository": "https://github.com/BirdRoad1/StudyTogether",
+  "author": "Jose",
+  "license": "MIT",
+  "private": false,
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.0.14",
+    "dotenv": "^17.2.0",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "zod": "^4.0.5"
+  }
+}
