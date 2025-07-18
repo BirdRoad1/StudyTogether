@@ -45,7 +45,6 @@ export class WSClient extends EventEmitter<Events> {
   }
 
   close(code?: number) {
-    console.log('close client')
     this.ws.close(code);
   }
 }

@@ -24,7 +24,6 @@ export class Client extends EventEmitter<Events> {
 
   onClose() {
     this.socket = undefined;
-    console.log("CLOSED");
     this.redirectTimeout = setTimeout(() => {
       // location.href = "/";
     }, 1000);

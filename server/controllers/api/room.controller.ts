@@ -5,7 +5,6 @@ import { MessageRegistry } from "@shared/message-registry.js";
 import { KickMessage } from "@shared/message/clientbound/kick-message.js";
 
 export const wsCreateRoom: WSRequestHandler = async (req, res) => {
-  console.log("create room");
   const ws = await res.accept();
   const room = RoomManager.createRoom();
 
@@ -16,7 +15,6 @@ export const wsCreateRoom: WSRequestHandler = async (req, res) => {
 };
 
 export const wsJoinRoom: WSRequestHandler = async (req, res) => {
-  console.log("join room");
   const ws = await res.accept();
   const client = new WSClient(ws);
 
@@ -45,6 +43,5 @@ export const wsJoinRoom: WSRequestHandler = async (req, res) => {
     return;
   }
 
-  console.log("good req");
   room.handleClient(client);
 };

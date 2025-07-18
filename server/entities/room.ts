@@ -23,18 +23,14 @@ export class Room extends EventEmitter<RoomEvents> {
   }
 
   handleClient(client: WSClient) {
-    console.log("b4");
     this.unregisteredClients.push(client);
     let user: User | undefined;
-    // console.log(client);
     client.on("close", () => {
-      console.log("CLOSE EMITTED");
       this.users = this.users.filter((u) => u.client !== client);
       this.unregisteredClients = this.unregisteredClients.filter(
         (c) => c !== client
       );
 
-      console.log("new users:", this.users);
 
       clearTimeout(this.destroyTimeout);
       this.destroyTimeout = setTimeout(() => {
@@ -55,7 +51,6 @@ export class Room extends EventEmitter<RoomEvents> {
                 error: "The username is already taken!",
               })
             );
-            console.log(this.users);
             return;
           }
 
