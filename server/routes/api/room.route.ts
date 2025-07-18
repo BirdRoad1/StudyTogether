@@ -1,7 +1,6 @@
 import { Router } from "websocket-express";
-import { wsCreateRoom } from "../../controllers/api/room.controller.js";
+import { wsCreateRoom,wsJoinRoom } from "../../controllers/api/room.controller.js";
 
-const roomRouter = new Router();
+export const roomRouter = new Router();
 roomRouter.ws("/create", wsCreateRoom);
-
-export { roomRouter };
+roomRouter.ws("/join", wsJoinRoom);

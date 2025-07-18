@@ -1,6 +1,6 @@
-import express from "express";
+import { Router } from "websocket-express";
 import { roomRouter } from "./room.route.js";
 
-export const apiRouter = express.Router();
+export const apiRouter = new Router();
 
 apiRouter.use("/room", roomRouter);

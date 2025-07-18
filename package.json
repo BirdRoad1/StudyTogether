@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently --names 'api,vite' 'tsx --watch server/index.ts' 'vite'",
+    "dev": "concurrently --names 'api,vite' 'tsx --tsconfig tsconfig.server.json --watch server/index.ts' 'vite'",
     "build": "rm -rf dist && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -15,8 +15,10 @@
   "dependencies": {
     "eventemitter3": "^5.0.1",
     "express": "^5.1.0",
+    "isomorphic-ws": "^5.0.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-router": "^7.7.0",
     "websocket-express": "^4.0.0",
     "ws": "^8.18.3",
     "zod": "^4.0.5"

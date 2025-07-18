@@ -1,6 +1,6 @@
-import {WebSocket} from 'ws';
+import { WSClient } from '@shared/ws-client.js';
 
 export interface User {
     name: string;
-    ws: WebSocket;
+    client: WSClient;
 }

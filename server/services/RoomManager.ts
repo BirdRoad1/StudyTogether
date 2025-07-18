@@ -12,7 +12,8 @@ export class RoomManager {
     return room;
   }
 
-  private static getRoomByCode(code: string) {
+
+  public static getRoomByCode(code: string) {
     return this.rooms.find((r) => r.code === code);
   }
 

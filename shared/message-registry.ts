@@ -1,13 +1,21 @@
-import type z from "zod";
-import { Message } from "./message.ts";
-import { JoinRoomMessage } from "./message/join-room-message.ts";
-
+import { Message } from "./message.js";
+import { JoinRoomMessage } from "./message/serverbound/join-room-message.js";
+import { JoinRoomResponseMessage } from "./message/clientbound/join-room-response-message.js";
+import type { z, ZodType } from "zod";
+import { KickMessage } from "./message/clientbound/kick-message.js";
+import { RequestLineSegmentMessage } from "./message/serverbound/request-line-segment.js";
+import { AddLineSegmentMessage } from "./message/clientbound/add-line-segment-message.js";
+import { RemoveLineSegmentMessage } from "./message/clientbound/remove-line-segment-message.js";
 export type MessageType = "join";
 
-export type MessageConstructor<T extends Message = Message> = {
+export type MessageConstructor<
+  T extends Message = Message,
+  S extends ZodType = ZodType
+> = {
   new (...args: never[]): T;
-  fromData: (id: number, data: unknown) => T;
-  schema: z.ZodObject;
+  schema: S;
+  create(id: number, data: z.infer<S>): T;
+  // fromData: (id: number, data: unknown) => T;
 };
 
 export class MessageRegistry {
@@ -15,6 +23,11 @@ export class MessageRegistry {
 
   static {
     this.registerMessageType(1, JoinRoomMessage);
+    this.registerMessageType(2, JoinRoomResponseMessage);
+    this.registerMessageType(3, KickMessage);
+    this.registerMessageType(4, RequestLineSegmentMessage);
+    this.registerMessageType(5, AddLineSegmentMessage);
+    this.registerMessageType(6, RemoveLineSegmentMessage);
   }
 
   static registerMessageType(id: number, ctor: MessageConstructor) {
@@ -29,8 +42,8 @@ export class MessageRegistry {
     if (
       data === null ||
       typeof data !== "object" ||
-      !("type" in data) ||
-      typeof data.type !== "number" ||
+      !("id" in data) ||
+      typeof data.id !== "number" ||
       !("payload" in data) ||
       data.payload === null ||
       typeof data.payload !== "object"
@@ -38,11 +51,28 @@ export class MessageRegistry {
       return null;
     }
 
-    const ctor = this.msgCtorMap.get(data.type);
+    const ctor = this.msgCtorMap.get(data.id);
     if (!ctor) {
       return null;
     }
 
-    return ctor.fromData(data.type, data.payload);
+    return ctor.create(data.id, data.payload);
+  }
+
+  static buildMessage<T extends MessageConstructor>(
+    ctor: T,
+    message: z.infer<T["schema"]>
+  ): Message {
+    let id: undefined | number;
+    for (const [msgId, msgCtor] of this.msgCtorMap) {
+      if (msgCtor === ctor) {
+        id = msgId;
+      }
+    }
+
+    if (id === undefined)
+      throw new Error(`The message ${ctor.name} has not been registered`);
+
+    return ctor.create(id, message);
   }
 }
