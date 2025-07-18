@@ -1,16 +1,108 @@
-import { useContext } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { ClientContext } from "../context/ClientContext.ts";
 import type { StickyNote } from "@shared/model/sticky-note.ts";
 import { StickyNoteComponent } from "./sticky-note-component.tsx";
 import { MessageRegistry } from "@shared/message-registry.ts";
 import { EditStickyNoteMessage } from "@shared/message/serverbound/edit-sticky-note-message.ts";
+import { AddStickyMessage } from "@shared/message/clientbound/add-sticky-message.ts";
+import { ApproveStickyMessage } from "@shared/message/clientbound/approve-sticky-message.ts";
+import { EditStickyMessage } from "@shared/message/clientbound/edit-sticky-message.ts";
+import { CreateStickyNoteMessage } from "@shared/message/serverbound/create-sticky-note-message.ts";
+import type { Message } from "@shared/message.ts";
+import { RemoveStickyNoteMessage } from "@shared/message/serverbound/remove-sticky-note-message.ts";
+import { CRemoveStickyNoteMessage } from "@shared/message/clientbound/remove-sticky-note-message.ts";
 
-type Props = {
-  stickies: StickyNote[];
-};
+type Props = { createStickySignal: number };
 
-export const StickyBoard = ({ stickies }: Props) => {
+export const StickyBoard = ({ createStickySignal }: Props) => {
   const client = useContext(ClientContext);
+  const [stickies, setStickies] = useState<StickyNote[]>([]);
+  const previousSignalRef = useRef<number>(createStickySignal);
+
+  useEffect(() => {
+    if (createStickySignal > previousSignalRef.current) {
+      const sticky = {
+        x: 50,
+        y: 50,
+        title: "Hello",
+        desc: "Hello, world",
+        id: crypto.randomUUID(),
+      };
+      setStickies((old) => [...old, sticky]);
+
+      client?.socket?.send(
+        MessageRegistry.buildMessage(CreateStickyNoteMessage, {
+          sticky,
+        })
+      );
+    }
+
+    previousSignalRef.current = createStickySignal;
+  }, [createStickySignal, client?.socket]);
+
+  useEffect(() => {
+    if (!client) return;
+
+    const msgHandler = (message: Message) => {
+      if (message instanceof AddStickyMessage) {
+        console.log("Add a sticky");
+        setStickies((old) => [...old, message.payload.sticky]);
+      } else if (message instanceof ApproveStickyMessage) {
+        console.log("Sticky approved");
+        setStickies((old) => {
+          const sticky = old.find((s) => message.payload.clientId === s.id);
+          const otherStickies = old.filter((s) => s != sticky);
+          if (!sticky) return old;
+          const copy = { ...sticky };
+          copy.id = message.payload.serverId;
+
+          return [...otherStickies, copy];
+        });
+      } else if (message instanceof EditStickyMessage) {
+        setStickies((old) => {
+          const sticky = old.find((s) => s.id === message.payload.sticky.id);
+          if (!sticky) return old;
+
+          const copy = structuredClone(sticky);
+
+          const edit = message.payload.sticky;
+
+          if (edit.desc !== undefined) {
+            copy.desc = edit.desc;
+          }
+
+          if (edit.title !== undefined) {
+            copy.title = edit.title;
+          }
+
+          if (edit.x !== undefined) {
+            copy.x = edit.x;
+          }
+
+          if (edit.y !== undefined) {
+            copy.y = edit.y;
+          }
+
+          return old.map((old) => (old.id === sticky.id ? copy : old));
+        });
+      } else if (message instanceof CRemoveStickyNoteMessage) {
+        setStickies((old) => {
+          return old.filter((sticky) => sticky.id !== message.payload.serverId);
+        });
+      }
+    };
+
+    const openHandler = () => {
+      client.socket?.on("message", msgHandler);
+    };
+
+    client.on("open", openHandler);
+
+    return () => {
+      client?.removeListener("open", openHandler);
+      client?.socket?.removeListener("message", msgHandler);
+    };
+  }, [client]);
 
   return (
     <div>
@@ -22,6 +114,13 @@ export const StickyBoard = ({ stickies }: Props) => {
             client?.socket?.send(
               MessageRegistry.buildMessage(EditStickyNoteMessage, {
                 sticky: { id: s.id, title, desc, x, y },
+              })
+            );
+          }}
+          onRemove={() => {
+            client?.socket?.send(
+              MessageRegistry.buildMessage(RemoveStickyNoteMessage, {
+                serverId: s.id,
               })
             );
           }}

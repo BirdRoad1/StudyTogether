@@ -1,0 +1,19 @@
+.mouse {
+  position: absolute;
+  z-index: 10;
+  width: 8px;
+  height: 8px;
+  background-color: rgba(0, 0, 0, 0.735);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+}
+
+.username {
+  margin-top: 20px;
+  text-align: center;
+  width: 150px;
+  height: 20px;
+  overflow: hidden;
+  transform: translateX(-50%);
+  font-family: "Roboto", sans-serif;
+}

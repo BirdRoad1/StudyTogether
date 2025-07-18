@@ -41,6 +41,10 @@ export class WSClient extends EventEmitter<Events> {
   }
 
   send(message: Message) {
+    if (this.ws.readyState !== WebSocket.OPEN) {
+      console.log("ws not ready!");
+      return;
+    }
     this.ws.send(JSON.stringify(message));
   }
 

@@ -12,6 +12,9 @@ import { CreateStickyNoteMessage } from "./message/serverbound/create-sticky-not
 import { RemoveStickyNoteMessage } from "./message/serverbound/remove-sticky-note-message.js";
 import { EditStickyNoteMessage } from "./message/serverbound/edit-sticky-note-message.js";
 import { ApproveStickyMessage } from "./message/clientbound/approve-sticky-message.js";
+import { CRemoveStickyNoteMessage } from "./message/clientbound/remove-sticky-note-message.js";
+import { CUserMousePosMessage } from "./message/clientbound/user-mouse-pos-message.js";
+import { SUserMousePosMessage } from "./message/serverbound/user-mouse-pos-message.js";
 
 export type MessageType = "join";
 
@@ -42,6 +45,9 @@ export class MessageRegistry {
     this.registerMessageType(11, RemoveStickyNoteMessage);
     this.registerMessageType(12, EditStickyNoteMessage);
     this.registerMessageType(13, ApproveStickyMessage);
+    this.registerMessageType(14, CRemoveStickyNoteMessage);
+    this.registerMessageType(15, CUserMousePosMessage);
+    this.registerMessageType(16, SUserMousePosMessage);
   }
 
   static registerMessageType(id: number, ctor: MessageConstructor) {

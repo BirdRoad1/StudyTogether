@@ -1,34 +1,46 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import styles from "./css/app.module.css";
 import { ClientContext } from "./context/ClientContext.ts";
 
 function App() {
   const client = useContext(ClientContext);
+  const [username, setUsername] = useState("");
 
   useEffect(() => {
-    console.log(client, client?.socket);
-    client?.on("join", (code) => {
-      location.href = "/room/" + code;
-    });
-  }, [client]);
+    const handler = (code: string) => {
+      location.href = "/room/" + code + "?username=" + username;
+    };
+    client?.on("join", handler);
+    return () => {
+      client?.removeListener("join", handler);
+    };
+  }, [client, username]);
 
   function createRoomClicked() {
-    client?.createRoom();
+    client?.createRoom(username);
   }
 
   return (
     <div className={styles.content}>
       <h1>GroupStudy</h1>
+      <input
+        type="text"
+        className={styles.username}
+        placeholder="Username"
+        onChange={(ev) => {
+          setUsername(ev.target.value);
+        }}
+      />
       <div className={styles.btns}>
         <button onClick={() => createRoomClicked()}>Create Room</button>
         <button
           onClick={() => {
             const code = prompt("Enter room code");
             if (!code || code.length !== 6) {
-              alert('Invalid code!');
+              alert("Invalid code!");
               return;
             }
-            location.href = "/room/" + code;
+            location.href = "/room/" + code + "?username=" + username;
           }}
         >
           Join Room

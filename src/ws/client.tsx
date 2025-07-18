@@ -50,7 +50,7 @@ export class Client extends EventEmitter<Events> {
     }
   }
 
-  createRoom() {
+  createRoom(username: string) {
     this.close();
 
     const url = `${this.getBackendUrl()}/api/room/create`;
@@ -61,7 +61,7 @@ export class Client extends EventEmitter<Events> {
       this.emit("open");
       this.socket?.send(
         MessageRegistry.buildMessage(JoinRoomMessage, {
-          username: crypto.randomUUID(),
+          username,
         })
       );
     });
@@ -73,7 +73,7 @@ export class Client extends EventEmitter<Events> {
     this.socket.on("close", this.onClose);
   }
 
-  joinRoom(code: string) {
+  joinRoom(username: string, code: string) {
     this.close();
 
     const url = `${this.getBackendUrl()}/api/room/join?code=${code}`;
@@ -85,7 +85,7 @@ export class Client extends EventEmitter<Events> {
       this.emit("open");
       this.socket?.send(
         MessageRegistry.buildMessage(JoinRoomMessage, {
-          username: crypto.randomUUID(),
+          username,
         })
       );
     });

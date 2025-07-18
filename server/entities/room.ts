@@ -11,10 +11,13 @@ import { LineSegment } from "@shared/model/line-segment.js";
 import { Stickies } from "./stickies.js";
 import { CreateStickyNoteMessage } from "@shared/message/serverbound/create-sticky-note-message.js";
 import { EditStickyNoteMessage } from "@shared/message/serverbound/edit-sticky-note-message.js";
-import { RemoveStickyNoteMessage } from "@shared/message/serverbound/remove-sticky-note-message.js";
 import { ApproveStickyMessage } from "@shared/message/clientbound/approve-sticky-message.js";
 import { EditStickyMessage } from "@shared/message/clientbound/edit-sticky-message.js";
 import { AddStickyMessage } from "@shared/message/clientbound/add-sticky-message.js";
+import { RemoveStickyNoteMessage } from "@shared/message/serverbound/remove-sticky-note-message.js";
+import { CRemoveStickyNoteMessage } from "@shared/message/clientbound/remove-sticky-note-message.js";
+import { SUserMousePosMessage } from "@shared/message/serverbound/user-mouse-pos-message.js";
+import { CUserMousePosMessage } from "@shared/message/clientbound/user-mouse-pos-message.js";
 
 interface RoomEvents {
   destroy: () => void;
@@ -50,6 +53,12 @@ export class Room extends EventEmitter<RoomEvents> {
 
     client.on("message", (msg) => {
       try {
+        if (!(msg instanceof JoinRoomMessage) && user === undefined) {
+          // Prevent unregistered user actions
+          console.log("Ignored unregistered user msg:", msg);
+          return;
+        }
+
         if (msg instanceof JoinRoomMessage) {
           if (user !== undefined) return; // ignore double-join
           if (this.users.some((u) => u.name === msg.payload.username)) {
@@ -66,6 +75,7 @@ export class Room extends EventEmitter<RoomEvents> {
             (user = {
               name: msg.payload.username,
               client: client,
+              id: crypto.randomUUID(),
             })
           );
 
@@ -176,7 +186,33 @@ export class Room extends EventEmitter<RoomEvents> {
             );
           }
         } else if (msg instanceof RemoveStickyNoteMessage) {
+          if (!this.stickies.has(msg.payload.serverId)) {
+            return;
+          }
+
+          this.stickies.remove(msg.payload.serverId);
+          for (const user of this.users) {
+            user.client.send(
+              MessageRegistry.buildMessage(CRemoveStickyNoteMessage, {
+                serverId: msg.payload.serverId,
+              })
+            );
+          }
+        } else if (msg instanceof SUserMousePosMessage) {
+          for (const otherUser of this.users) {
+            if (otherUser.id === user?.id) continue;
+            otherUser.client.send(
+              MessageRegistry.buildMessage(CUserMousePosMessage, {
+                userId: otherUser.id,
+                username: otherUser.name,
+                x: msg.payload.x,
+                y: msg.payload.y,
+              })
+            );
+          }
         }
+        // else if (msg instanceof RemoveStickyNoteMessage) {
+        // }
 
         console.log("Got message:", msg);
       } catch (err) {

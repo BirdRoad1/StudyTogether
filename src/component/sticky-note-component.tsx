@@ -5,9 +5,10 @@ import type { StickyNote } from "@shared/model/sticky-note.ts";
 type Props = {
   sticky: StickyNote;
   onChange?: (title: string, desc: string, x: number, y: number) => void;
+  onRemove?: () => void;
 };
 
-export const StickyNoteComponent = ({ sticky, onChange }: Props) => {
+export const StickyNoteComponent = ({ sticky, onChange, onRemove }: Props) => {
   const [mouseDown, setMouseDown] = useState(false);
   const [mouseX, setMouseX] = useState(0);
   const [mouseY, setMouseY] = useState(0);
@@ -30,7 +31,7 @@ export const StickyNoteComponent = ({ sticky, onChange }: Props) => {
       if (mouseDown) {
         setStickyX(x - (offsetX ?? 0));
         setStickyY(y - (offsetY ?? 0));
-        onChange?.(title, desc, x, y);
+        onChange?.(title, desc, x - (offsetX ?? 0), y - (offsetY ?? 0));
       }
     };
 
@@ -49,17 +50,21 @@ export const StickyNoteComponent = ({ sticky, onChange }: Props) => {
 
     sticky.addEventListener("mouseup", () => {
       setMouseDown(false);
-      onChange?.(title, desc, mouseX - stickyX, mouseY - stickyY);
     });
   }, [desc, mouseX, mouseY, onChange, stickyX, stickyY, title]);
 
-  function onTitleChange() {
-    onChange?.(title, desc, mouseX - stickyX, mouseY - stickyY);
-  }
+  useEffect(() => {
+    setStickyX(sticky.x);
+    setStickyY(sticky.y);
+  }, [sticky.x, sticky.y]);
 
-  function onDescChange() {
-    onChange?.(title, desc, mouseX - stickyX, mouseY - stickyY);
-  }
+  useEffect(() => {
+    setTitle(sticky.title);
+  }, [sticky.title]);
+
+  useEffect(() => {
+    setDesc(sticky.desc);
+  }, [sticky.desc]);
 
   return (
     <div
@@ -76,7 +81,7 @@ export const StickyNoteComponent = ({ sticky, onChange }: Props) => {
           type="text"
           onChange={(ev) => {
             setTitle(ev.target.value);
-            onTitleChange();
+            onChange?.(ev.target.value, desc, stickyX, stickyY);
           }}
           value={title}
           className={styles.title}
@@ -86,12 +91,15 @@ export const StickyNoteComponent = ({ sticky, onChange }: Props) => {
       <textarea
         onChange={(ev) => {
           setDesc(ev.target.value);
-          onDescChange();
+          onChange?.(title, ev.target.value, stickyX, stickyY);
         }}
         value={desc}
         className={styles.desc}
         placeholder="Description"
       />
+      <button className={styles.remove} onClick={onRemove}>
+        Remove
+      </button>
     </div>
   );
 };

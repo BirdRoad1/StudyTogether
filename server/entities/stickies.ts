@@ -18,6 +18,10 @@ export class Stickies {
     return note;
   }
 
+  has(id: string) {
+    return this.stickyMap.has(id);
+  }
+
   get(id: string) {
     return this.stickyMap.get(id);
   }
@@ -48,5 +52,9 @@ export class Stickies {
     }
 
     return sticky;
+  }
+
+  remove(id: string) {
+    this.stickyMap.delete(id);
   }
 }
