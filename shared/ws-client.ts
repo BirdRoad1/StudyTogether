@@ -34,7 +34,7 @@ export class WSClient extends EventEmitter<Events> {
     };
 
     ws.onclose = (code) => {
-      this.emit('close', code.code)
+      this.emit("close", code.code);
     };
     ws.onerror = (ev) => this.emit("error", ev.error);
     ws.onopen = () => this.emit("open");

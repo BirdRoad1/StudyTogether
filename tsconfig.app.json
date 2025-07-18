@@ -24,7 +24,8 @@
     "noUncheckedSideEffectImports": true,
     "paths": {
       "@shared/*": ["./shared/*"]
-    }
+    },
+    "outDir": "./dist/"
   },
   "include": ["src"]
 }

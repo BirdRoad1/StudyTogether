@@ -8,8 +8,8 @@ import { KickMessage } from "@shared/message/clientbound/kick-message.js";
 import type { Message } from "@shared/message.ts";
 
 type Events = {
+  open: () => void;
   join: (code: string) => void;
-  message: (message: Message) => void;
 };
 
 export class Client extends EventEmitter<Events> {
@@ -36,7 +36,7 @@ export class Client extends EventEmitter<Events> {
   }
 
   handleMessage(message: Message) {
-    this.emit("message", message);
+    console.log(message, message instanceof JoinRoomResponseMessage);
     if (message instanceof JoinRoomResponseMessage) {
       if (!message.payload.success) {
         alert(message.payload.error);
@@ -58,9 +58,10 @@ export class Client extends EventEmitter<Events> {
     this.socket = new WSClient(new WebSocket(url));
     this.socket.on("message", this.handleMessage.bind(this));
     this.socket.on("open", () => {
+      this.emit("open");
       this.socket?.send(
         MessageRegistry.buildMessage(JoinRoomMessage, {
-          username: prompt("Enter username:"),
+          username: crypto.randomUUID(),
         })
       );
     });
@@ -81,9 +82,10 @@ export class Client extends EventEmitter<Events> {
     this.socket.on("message", this.handleMessage.bind(this));
 
     this.socket.on("open", () => {
+      this.emit("open");
       this.socket?.send(
         MessageRegistry.buildMessage(JoinRoomMessage, {
-          username: prompt("Enter username:"),
+          username: crypto.randomUUID(),
         })
       );
     });

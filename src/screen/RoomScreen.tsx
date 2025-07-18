@@ -25,7 +25,7 @@ export const RoomScreen = () => {
   useEffect(() => {
     if (!client) return;
 
-    client.on("message", (message) => {
+    client.socket?.on("message", (message) => {
       if (message instanceof AddStickyMessage) {
         setStickies([...stickies, message.payload.sticky]);
       } else if (message instanceof ApproveStickyMessage) {
@@ -60,7 +60,6 @@ export const RoomScreen = () => {
           copy.y = edit.y;
         }
 
-        console.log("Edited sticky!");
         setStickies([...others, { ...copy }]);
       }
     });

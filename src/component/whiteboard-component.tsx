@@ -66,59 +66,65 @@ export const Whiteboard = () => {
   }, [position]);
 
   useEffect(() => {
-    const msgHandler = (message: Message) => {
-      if (message instanceof AddLineSegmentMessage) {
-        const payload = message.payload;
-        for (const seg of payload.segments) {
-          if (seg.type === "client") {
-            // Probably confirming existing segment
-            setLineSegments((old) => {
-              const segment = findSegment2d(old, seg.clientId);
-              if (!segment) return old;
-              const [i, j] = segment;
-              const deepCopy = deepCopy2d(old);
+    client?.on("open", () => {
+      if (!client?.socket) {
+        console.log("No socket");
+        return;
+      }
 
-              deepCopy[i][j].status = "confirmed";
-              deepCopy[i][j].id = seg.serverId;
-              return deepCopy;
+      const msgHandler = (message: Message) => {
+        if (message instanceof AddLineSegmentMessage) {
+          const payload = message.payload;
+          for (const seg of payload.segments) {
+            if (seg.type === "client") {
+              // Probably confirming existing segment
+              setLineSegments((old) => {
+                const segment = findSegment2d(old, seg.clientId);
+                if (!segment) return old;
+                const [i, j] = segment;
+                const deepCopy = deepCopy2d(old);
+
+                deepCopy[i][j].status = "confirmed";
+                deepCopy[i][j].id = seg.serverId;
+                return deepCopy;
+              });
+            } else {
+              // Adding a new segment!
+              setServerSegments((old) => [
+                ...old,
+                { ...seg.segment, status: "confirmed" },
+              ]);
+            }
+          }
+        } else if (message instanceof RemoveLineSegmentMessage) {
+          if (message.payload.type === "client") {
+            // Remove client
+            setLineSegments((seg) => {
+              const segment = findSegment2d(seg, message.payload.id);
+              if (!segment) return seg;
+              const [i, j] = segment;
+              const copy = deepCopy2d(seg);
+              copy[i].splice(j, 1);
+              return copy;
             });
-          } else {
-            // Adding a new segment!
-            setServerSegments((old) => [
-              ...old,
-              { ...seg.segment, status: "confirmed" },
-            ]);
+          } else if (message.payload.type === "server") {
+            setServerSegments((old) => {
+              const i = findSegment(old, message.payload.id);
+              if (i < 0) return old;
+              const copy = deepCopy(old);
+              copy.splice(i, 1);
+              return copy;
+            });
           }
         }
-      } else if (message instanceof RemoveLineSegmentMessage) {
-        if (message.payload.type === "client") {
-          // Remove client
-          setLineSegments((seg) => {
-            const segment = findSegment2d(seg, message.payload.id);
-            if (!segment) return seg;
-            const [i, j] = segment;
-            const copy = deepCopy2d(seg);
-            copy[i].splice(j, 1);
-            return copy;
-          });
-        } else if (message.payload.type === "server") {
-          setServerSegments((old) => {
-            const i = findSegment(old, message.payload.id);
-            if (i < 0) return old;
-            const copy = deepCopy(old);
-            copy.splice(i, 1);
-            return copy;
-          });
-        }
-      }
-    };
+      };
 
-    client?.on("message", msgHandler);
-
-    return () => {
-      client?.socket?.removeListener("message", msgHandler);
-    };
-  }, [client?.socket, client, roomCode]);
+      client?.socket?.on("message", msgHandler);
+    });
+    // return () => {
+    //   client?.socket?.removeListener("message", msgHandler);
+    // };
+  }, [client, roomCode]);
 
   useEffect(() => {
     const currCanvas = canvas.current;
@@ -180,8 +186,6 @@ export const Whiteboard = () => {
         }
       });
 
-      console.log("Line segment added!");
-
       setLastCheckedPos({ x, y });
     }
   }, [client?.socket, isMouseDown, lastCheckedPos, lineSegments, position]);
@@ -208,7 +212,6 @@ export const Whiteboard = () => {
     ctx.beginPath();
     for (let i = 0; i < serverSegments.length; i++) {
       const segment = serverSegments[i];
-
       ctx.moveTo(segment.startX, segment.startY);
       ctx.lineTo(segment.endX, segment.endY);
     }

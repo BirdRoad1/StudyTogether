@@ -6,6 +6,7 @@ function App() {
   const client = useContext(ClientContext);
 
   useEffect(() => {
+    console.log(client, client?.socket);
     client?.on("join", (code) => {
       location.href = "/room/" + code;
     });
@@ -19,7 +20,7 @@ function App() {
     <div className={styles.content}>
       <h1>GroupStudy</h1>
       <div className={styles.btns}>
-        <button onClick={createRoomClicked}>Create Room</button>
+        <button onClick={() => createRoomClicked()}>Create Room</button>
         <button
           onClick={() => {
             const code = prompt("Enter room code");
