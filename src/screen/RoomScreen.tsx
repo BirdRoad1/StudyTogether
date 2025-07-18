@@ -3,10 +3,6 @@ import styles from "../css/room.module.css";
 import { Whiteboard } from "../component/whiteboard-component.tsx";
 import { useContext, useEffect, useState } from "react";
 import { ClientContext } from "../context/ClientContext.ts";
-// import { MessageRegistry } from "@shared/message-registry.ts";
-// import { CreateStickyNoteMessage } from "@shared/message/serverbound/create-sticky-note-message.ts";
-// import { StickyNoteComponent } from "../component/sticky-note-component.tsx";
-// import { EditStickyNoteMessage } from "@shared/message/serverbound/edit-sticky-note-message.ts";
 import { StickyBoard } from "../component/sticky-board-component.tsx";
 import { MiceComponent } from "../component/mice-component.tsx";
 
