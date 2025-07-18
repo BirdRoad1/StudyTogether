@@ -9,6 +9,7 @@ import type { Message } from "@shared/message.ts";
 
 type Events = {
   join: (code: string) => void;
+  message: (message: Message) => void;
 };
 
 export class Client extends EventEmitter<Events> {
@@ -35,6 +36,7 @@ export class Client extends EventEmitter<Events> {
   }
 
   handleMessage(message: Message) {
+    this.emit("message", message);
     if (message instanceof JoinRoomResponseMessage) {
       if (!message.payload.success) {
         alert(message.payload.error);
@@ -58,7 +60,7 @@ export class Client extends EventEmitter<Events> {
     this.socket.on("open", () => {
       this.socket?.send(
         MessageRegistry.buildMessage(JoinRoomMessage, {
-          username: prompt("Enter a username") ?? 'Bob',
+          username: prompt("Enter username:"),
         })
       );
     });
@@ -80,7 +82,9 @@ export class Client extends EventEmitter<Events> {
 
     this.socket.on("open", () => {
       this.socket?.send(
-        MessageRegistry.buildMessage(JoinRoomMessage, { username: prompt("Enter a username") ?? 'Bob' })
+        MessageRegistry.buildMessage(JoinRoomMessage, {
+          username: prompt("Enter username:"),
+        })
       );
     });
 

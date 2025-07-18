@@ -20,7 +20,18 @@ function App() {
       <h1>GroupStudy</h1>
       <div className={styles.btns}>
         <button onClick={createRoomClicked}>Create Room</button>
-        <button>Join Room</button>
+        <button
+          onClick={() => {
+            const code = prompt("Enter room code");
+            if (!code || code.length !== 6) {
+              alert('Invalid code!');
+              return;
+            }
+            location.href = "/room/" + code;
+          }}
+        >
+          Join Room
+        </button>
       </div>
     </div>
   );

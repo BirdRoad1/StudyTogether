@@ -1,0 +1,36 @@
+.stickynote {
+  position: fixed;
+  width: 312px;
+  height: 312px;
+  background-color: rgb(220, 214, 39);
+  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
+  font-family: "Roboto", sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+.top {
+  width: 100%;
+  background-color: rgb(187, 181, 23);
+  padding: 15px;
+}
+
+.title {
+  background-color: rgba(0, 0, 0, 0);
+  border: none;
+  font-size: 30px;
+  width: 100%;
+  outline: none;
+}
+
+.desc {
+  padding: 15px;
+  background-color: rgba(0, 0, 0, 0);
+  border: none;
+  font-size: 18px;
+  width: 100%;
+  resize: none;
+  font-family: 'Roboto', sans-serif;
+  flex: 1;
+  outline: none;
+}

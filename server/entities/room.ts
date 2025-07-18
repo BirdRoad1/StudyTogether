@@ -8,6 +8,14 @@ import { Whiteboard } from "./whiteboard.js";
 import { AddLineSegmentMessage } from "@shared/message/clientbound/add-line-segment-message.js";
 import { RequestLineSegmentMessage } from "@shared/message/serverbound/request-line-segment.js";
 import { LineSegment } from "@shared/model/line-segment.js";
+import { Stickies } from "./stickies.js";
+import { CreateStickyNoteMessage } from "@shared/message/serverbound/create-sticky-note-message.js";
+import { EditStickyNoteMessage } from "@shared/message/serverbound/edit-sticky-note-message.js";
+import { RemoveStickyNoteMessage } from "@shared/message/serverbound/remove-sticky-note-message.js";
+import { ApproveStickyMessage } from "@shared/message/clientbound/approve-sticky-message.js";
+import { EditStickyMessage } from "@shared/message/clientbound/edit-sticky-message.js";
+import { AddStickyMessage } from "@shared/message/clientbound/add-sticky-message.js";
+
 interface RoomEvents {
   destroy: () => void;
 }
@@ -17,6 +25,7 @@ export class Room extends EventEmitter<RoomEvents> {
   private unregisteredClients: WSClient[] = [];
   private destroyTimeout?: NodeJS.Timeout;
   private whiteboard = new Whiteboard();
+  private stickies = new Stickies();
 
   constructor(public readonly code: string) {
     super();
@@ -30,7 +39,6 @@ export class Room extends EventEmitter<RoomEvents> {
       this.unregisteredClients = this.unregisteredClients.filter(
         (c) => c !== client
       );
-
 
       clearTimeout(this.destroyTimeout);
       this.destroyTimeout = setTimeout(() => {
@@ -90,6 +98,13 @@ export class Room extends EventEmitter<RoomEvents> {
               }),
             })
           );
+
+          // Send missing stickies
+          this.stickies.stickyMap.forEach((sticky) =>
+            client.send(
+              MessageRegistry.buildMessage(AddStickyMessage, { sticky })
+            )
+          );
         } else if (msg instanceof RequestLineSegmentMessage) {
           const uuid = this.whiteboard.addLineSegment(msg.payload.segment);
           client.send(
@@ -118,6 +133,49 @@ export class Room extends EventEmitter<RoomEvents> {
               })
             );
           }
+        } else if (msg instanceof CreateStickyNoteMessage) {
+          const sticky = msg.payload.sticky;
+          const newSticky = this.stickies.add(
+            sticky.title,
+            sticky.desc,
+            sticky.x,
+            sticky.y
+          );
+
+          client.send(
+            MessageRegistry.buildMessage(ApproveStickyMessage, {
+              clientId: sticky.id,
+              serverId: newSticky.id,
+            })
+          );
+
+          for (const user of this.users) {
+            if (user.client === client) continue;
+
+            user.client.send(
+              MessageRegistry.buildMessage(AddStickyMessage, {
+                sticky: newSticky,
+              })
+            );
+          }
+        } else if (msg instanceof EditStickyNoteMessage) {
+          const sticky = msg.payload.sticky;
+          const newSticky = this.stickies.get(sticky.id);
+          if (!newSticky) return;
+
+          newSticky.desc = sticky.desc;
+          newSticky.title = sticky.title;
+          newSticky.x = sticky.x;
+          newSticky.y = sticky.y;
+
+          for (const user of this.users) {
+            user.client.send(
+              MessageRegistry.buildMessage(EditStickyMessage, {
+                sticky: newSticky,
+              })
+            );
+          }
+        } else if (msg instanceof RemoveStickyNoteMessage) {
         }
 
         console.log("Got message:", msg);

@@ -6,6 +6,13 @@ import { KickMessage } from "./message/clientbound/kick-message.js";
 import { RequestLineSegmentMessage } from "./message/serverbound/request-line-segment.js";
 import { AddLineSegmentMessage } from "./message/clientbound/add-line-segment-message.js";
 import { RemoveLineSegmentMessage } from "./message/clientbound/remove-line-segment-message.js";
+import { AddStickyMessage } from "./message/clientbound/add-sticky-message.js";
+import { EditStickyMessage } from "./message/clientbound/edit-sticky-message.js";
+import { CreateStickyNoteMessage } from "./message/serverbound/create-sticky-note-message.js";
+import { RemoveStickyNoteMessage } from "./message/serverbound/remove-sticky-note-message.js";
+import { EditStickyNoteMessage } from "./message/serverbound/edit-sticky-note-message.js";
+import { ApproveStickyMessage } from "./message/clientbound/approve-sticky-message.js";
+
 export type MessageType = "join";
 
 export type MessageConstructor<
@@ -28,6 +35,13 @@ export class MessageRegistry {
     this.registerMessageType(4, RequestLineSegmentMessage);
     this.registerMessageType(5, AddLineSegmentMessage);
     this.registerMessageType(6, RemoveLineSegmentMessage);
+    this.registerMessageType(7, RemoveLineSegmentMessage);
+    this.registerMessageType(8, AddStickyMessage);
+    this.registerMessageType(9, EditStickyMessage);
+    this.registerMessageType(10, CreateStickyNoteMessage);
+    this.registerMessageType(11, RemoveStickyNoteMessage);
+    this.registerMessageType(12, EditStickyNoteMessage);
+    this.registerMessageType(13, ApproveStickyMessage);
   }
 
   static registerMessageType(id: number, ctor: MessageConstructor) {
