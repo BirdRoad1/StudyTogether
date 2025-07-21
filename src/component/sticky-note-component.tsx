@@ -17,6 +17,7 @@ export const StickyNoteComponent = ({ sticky, onChange, onRemove }: Props) => {
   const stickyRef = useRef<HTMLDivElement>(null);
   const [title, setTitle] = useState(sticky.title);
   const [desc, setDesc] = useState(sticky.desc);
+  const mouseDownRef = useRef(mouseDown);
 
   useEffect(() => {
     const handler = (ev: MouseEvent) => {
@@ -46,18 +47,20 @@ export const StickyNoteComponent = ({ sticky, onChange, onRemove }: Props) => {
     if (!sticky) return;
     sticky.addEventListener("mousedown", () => {
       setMouseDown(true);
+      mouseDownRef.current = true;
     });
 
     sticky.addEventListener("mouseup", () => {
       setMouseDown(false);
+      mouseDownRef.current = false;
     });
   }, [desc, mouseX, mouseY, onChange, stickyX, stickyY, title]);
 
   useEffect(() => {
-    if (mouseDown) return;
+    if (mouseDownRef.current) return;
     setStickyX(sticky.x);
     setStickyY(sticky.y);
-  }, [sticky.x, sticky.y, mouseDown]);
+  }, [sticky.x, sticky.y]);
 
   useEffect(() => {
     setTitle(sticky.title);

@@ -1,5 +1,4 @@
-import { useContext, useEffect, useRef, useState } from "react";
-import { ClientContext } from "../context/ClientContext.ts";
+import { useEffect, useRef, useState } from "react";
 import type { StickyNote } from "@shared/model/sticky-note.ts";
 import { StickyNoteComponent } from "./sticky-note-component.tsx";
 import { MessageRegistry } from "@shared/message-registry.ts";
@@ -10,11 +9,11 @@ import { CEditStickyMessage } from "@shared/message/clientbound/edit-sticky-mess
 import { SCreateStickyNoteMessage } from "@shared/message/serverbound/create-sticky-note-message.server.ts";
 import type { Message } from "@shared/message.ts";
 import { SRemoveStickyNoteMessage } from "@shared/message/serverbound/remove-sticky-note-message.server.ts";
+import { client } from "../ws/client.tsx";
 
 type Props = { createStickySignal: number };
 
 export const StickyBoard = ({ createStickySignal }: Props) => {
-  const client = useContext(ClientContext);
   const [stickies, setStickies] = useState<StickyNote[]>([]);
   const previousSignalRef = useRef<number>(createStickySignal);
 
@@ -37,7 +36,7 @@ export const StickyBoard = ({ createStickySignal }: Props) => {
     }
 
     previousSignalRef.current = createStickySignal;
-  }, [createStickySignal, client?.socket]);
+  }, [createStickySignal]);
 
   useEffect(() => {
     if (!client) return;
@@ -57,6 +56,7 @@ export const StickyBoard = ({ createStickySignal }: Props) => {
         });
       } else if (message.isMessageOf(CEditStickyMessage)) {
         setStickies((old) => {
+          console.log('Stickies edited by server')
           const sticky = old.find((s) => s.id === message.payload.sticky.id);
           if (!sticky) return old;
 
@@ -99,7 +99,7 @@ export const StickyBoard = ({ createStickySignal }: Props) => {
       client?.removeListener("open", openHandler);
       client?.socket?.removeListener("message", msgHandler);
     };
-  }, [client]);
+  }, []);
 
   return (
     <div>

@@ -1,14 +1,13 @@
-import { useContext, useEffect, useState } from "react";
-import { ClientContext } from "../context/ClientContext.ts";
+import { useEffect, useState } from "react";
 import { MessageRegistry } from "@shared/message-registry.ts";
 import type { Message } from "@shared/message.ts";
 import type { Mouse } from "@shared/model/mouse.ts";
 import { CUserMousePosMessage } from "@shared/message/clientbound/user-mouse-pos-message.client.ts";
 import { SUserMousePosMessage } from "@shared/message/serverbound/user-mouse-pos-message.server.ts";
 import styles from "../css/mice.module.css";
+import { client } from "../ws/client.tsx";
 
 export const MiceComponent = () => {
-  const client = useContext(ClientContext);
   const [mice, setMice] = useState<Mouse[]>([]);
 
   useEffect(() => {
@@ -25,7 +24,7 @@ export const MiceComponent = () => {
     return () => {
       window.removeEventListener("mousemove", listener);
     };
-  }, [client]);
+  });
 
   useEffect(() => {
     if (!client) return;
@@ -58,7 +57,7 @@ export const MiceComponent = () => {
       client?.removeListener("open", openHandler);
       client?.socket?.removeListener("message", msgHandler);
     };
-  }, [client]);
+  }, []);
 
   return (
     <div>

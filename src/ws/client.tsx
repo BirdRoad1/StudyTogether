@@ -10,6 +10,8 @@ import type { Message } from "@shared/message.ts";
 type Events = {
   open: () => void;
   join: (code: string) => void;
+  kick: (reason: string) => void;
+  close: () => void;
 };
 
 export class Client extends EventEmitter<Events> {
@@ -18,21 +20,18 @@ export class Client extends EventEmitter<Events> {
   getBackendUrl() {
     return import.meta.env.PROD
       ? ""
-      : `http://localhost:${
+      : `http://${location.hostname}:${
           (window as unknown as Record<string, unknown>).BACKEND_PORT
         }`;
   }
 
   onClose() {
     this.socket = undefined;
-    this.redirectTimeout = setTimeout(() => {
-      // location.href = "/";
-    }, 1000);
   }
 
   onKick(reason: string) {
     this.close();
-    alert("Kicked: " + reason);
+    this.emit("kick", reason);
   }
 
   handleMessage(message: Message) {
@@ -106,3 +105,5 @@ export class Client extends EventEmitter<Events> {
     this.socket = undefined;
   }
 }
+
+export const client = new Client();

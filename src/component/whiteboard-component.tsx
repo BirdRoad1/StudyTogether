@@ -1,5 +1,4 @@
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { ClientContext } from "../context/ClientContext.ts";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router";
 import styles from "../css/room.module.css";
 import type { LineSegment } from "@shared/model/line-segment.ts";
@@ -8,6 +7,7 @@ import { SRequestLineSegmentMessage } from "@shared/message/serverbound/request-
 import { CAddLineSegmentMessage } from "@shared/message/clientbound/add-line-segment-message.client.ts";
 import { CRemoveLineSegmentMessage } from "@shared/message/clientbound/remove-line-segment-message.client.ts";
 import type { Message } from "@shared/message.ts";
+import { client } from "../ws/client.tsx";
 
 const MIN_MOVE_DISTANCE = 5;
 
@@ -49,7 +49,6 @@ function round(num: number) {
 }
 
 export const Whiteboard = () => {
-  const client = useContext(ClientContext);
   const { roomCode } = useParams() as { roomCode: string };
   const canvas = useRef<HTMLCanvasElement | null>(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -124,7 +123,7 @@ export const Whiteboard = () => {
     // return () => {
     //   client?.socket?.removeListener("message", msgHandler);
     // };
-  }, [client, roomCode]);
+  }, [roomCode]);
 
   useEffect(() => {
     const currCanvas = canvas.current;
@@ -188,7 +187,7 @@ export const Whiteboard = () => {
 
       setLastCheckedPos({ x, y });
     }
-  }, [client?.socket, isMouseDown, lastCheckedPos, lineSegments, position]);
+  }, [isMouseDown, lastCheckedPos, lineSegments, position]);
 
   const animate = useCallback(() => {
     const currCanvas = canvas.current;

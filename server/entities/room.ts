@@ -210,8 +210,9 @@ export class Room extends EventEmitter<RoomEvents> {
           newSticky.x = sticky.x;
           newSticky.y = sticky.y;
 
-          for (const user of this.users) {
-            user.client.send(
+          for (const otherUser of this.users) {
+            if (otherUser.id === user?.id) continue;
+            otherUser.client.send(
               MessageRegistry.buildMessage(CEditStickyMessage, {
                 sticky: newSticky,
               })
@@ -338,8 +339,10 @@ export class Room extends EventEmitter<RoomEvents> {
           if (!user) return;
           if (msg.payload.type === "shared") {
             this.sharedNotes = msg.payload.content;
-            for (const user of this.users) {
-              user.client.send(
+            for (const otherUser of this.users) {
+              if (otherUser.id === user?.id) continue;
+
+              otherUser.client.send(
                 MessageRegistry.buildMessage(CEditNotesMessage, {
                   type: "shared",
                   content: msg.payload.content,

@@ -24,13 +24,22 @@
   background-color: rgb(20, 20, 20);
 }
 
-.notepad {
+.notepadContainer {
+  display: flex;
+  flex-direction: column;
   width: 600px;
   height: 750px;
+  background-color: rgb(44, 44, 44);
+}
+
+.notepad {
+  width: 100%;
+  flex: 1;
+  background-color: rgb(44, 44, 44);
   font-family: "Roboto", sans-serif;
   padding: 10px;
   outline: none;
-  background-color: rgb(44, 44, 44);
   color: white;
   border: none;
+  resize: none;
 }

@@ -1,13 +1,12 @@
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import styles from "../css/llm-chat.module.css";
-import { ClientContext } from "../context/ClientContext.ts";
 import { MessageRegistry } from "@shared/message-registry.ts";
 import { SSendLLMMessage } from "@shared/message/serverbound/send-llm-message.server.ts";
 import type { LLMMessage } from "@shared/model/llm-message.ts";
 import { CLLMChatCompleteMessage } from "@shared/message/clientbound/llm-chat-complete-message.client.ts";
+import { client } from "../ws/client.tsx";
 
 export const LLMChat = () => {
-  const client = useContext(ClientContext);
 
   const [isShared, setIsShared] = useState(true);
   const [sharedMessages, setSharedMessages] = useState<LLMMessage[]>([]);
@@ -26,7 +25,25 @@ export const LLMChat = () => {
         type,
       })
     );
-  }, [client, inputText, isShared]);
+  }, [inputText, isShared]);
+
+  useEffect(() => {
+    if (isShared) {
+      messagesDivRef.current?.scroll({
+        top: messagesDivRef.current?.scrollHeight,
+        behavior: "smooth"
+      });
+    }
+  }, [sharedMessages, isShared]);
+  
+  useEffect(() => {
+    if (!isShared) {
+      messagesDivRef.current?.scroll({
+        top: messagesDivRef.current?.scrollHeight,
+        behavior: "smooth"
+      });
+    }
+  }, [personalMessages, isShared]);
 
   useEffect(() => {
     const openListener = () => {
@@ -35,18 +52,8 @@ export const LLMChat = () => {
         if (msg.isMessageOf(CLLMChatCompleteMessage)) {
           if (msg.payload.type === "shared") {
             setSharedMessages(msg.payload.messages);
-            if (isShared) {
-              messagesDivRef.current?.scroll({
-                top: messagesDivRef.current?.scrollHeight,
-              });
-            }
           } else {
             setPersonalMessages(msg.payload.messages);
-            if (!isShared) {
-              messagesDivRef.current?.scroll({
-                top: messagesDivRef.current?.scrollHeight,
-              });
-            }
           }
         }
       });
@@ -57,7 +64,7 @@ export const LLMChat = () => {
     return () => {
       client?.removeListener("open", openListener);
     };
-  }, [client, isShared]);
+  }, [isShared]);
 
   useEffect(() => {
     console.log(isShared);

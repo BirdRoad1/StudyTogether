@@ -1,13 +1,12 @@
-import { useContext, useEffect, useState, type ChangeEvent } from "react";
+import { useEffect, useState, type ChangeEvent } from "react";
 import styles from "../css/notepad.module.css";
-import { ClientContext } from "../context/ClientContext.ts";
 import { MessageRegistry } from "@shared/message-registry.ts";
 import { SEditNotesMessage } from "@shared/message/serverbound/edit-notes-message.server.ts";
 import type { Message } from "@shared/message.ts";
 import { CEditNotesMessage } from "@shared/message/clientbound/edit-notes-message.client.ts";
+import { client } from "../ws/client.tsx";
 
 export const Notepad = () => {
-  const client = useContext(ClientContext);
 
   const [isShared, setIsShared] = useState(true);
   const [personalContent, setPersonalContent] = useState("");
@@ -47,10 +46,10 @@ export const Notepad = () => {
       client?.removeListener("open", openListener);
       client?.socket?.removeListener("message", msgListener);
     };
-  }, [client, setContent]);
+  }, [setContent]);
 
   return (
-    <div>
+    <div className={styles.notepadContainer}>
       <div className={styles.tabs}>
         <button
           className={`${styles.tab} ${isShared ? styles.selected : ""}`}

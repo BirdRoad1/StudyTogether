@@ -1,9 +1,8 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./css/app.module.css";
-import { ClientContext } from "./context/ClientContext.ts";
+import { client } from "./ws/client.tsx";
 
 function App() {
-  const client = useContext(ClientContext);
   const [username, setUsername] = useState("");
 
   useEffect(() => {
@@ -14,7 +13,7 @@ function App() {
     return () => {
       client?.removeListener("join", handler);
     };
-  }, [client, username]);
+  }, [username]);
 
   function createRoomClicked() {
     client?.createRoom(username);
