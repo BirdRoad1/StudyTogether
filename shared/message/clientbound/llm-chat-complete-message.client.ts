@@ -1,4 +1,4 @@
-import { createMessageClass } from "@shared/typed-message.ts";
+import { createMessageClass } from "@shared/typed-message.js";
 import z from "zod";
 
 export const CLLMChatCompleteMessage = createMessageClass(

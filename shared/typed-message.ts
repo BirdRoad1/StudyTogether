@@ -1,4 +1,4 @@
-import { Message } from "@shared/message.ts";
+import { Message } from "@shared/message.js";
 import z from "zod";
 
 export function createMessageClass<T extends z.ZodType>(
