@@ -3,8 +3,8 @@ import { ClientContext } from "../context/ClientContext.ts";
 import { MessageRegistry } from "@shared/message-registry.ts";
 import type { Message } from "@shared/message.ts";
 import type { Mouse } from "@shared/model/mouse.ts";
-import { CUserMousePosMessage } from "@shared/message/clientbound/user-mouse-pos-message.ts";
-import { SUserMousePosMessage } from "@shared/message/serverbound/user-mouse-pos-message.ts";
+import { CUserMousePosMessage } from "@shared/message/clientbound/user-mouse-pos-message.client.ts";
+import { SUserMousePosMessage } from "@shared/message/serverbound/user-mouse-pos-message.server.ts";
 import styles from "../css/mice.module.css";
 
 export const MiceComponent = () => {
@@ -31,7 +31,7 @@ export const MiceComponent = () => {
     if (!client) return;
 
     const msgHandler = (message: Message) => {
-      if (message instanceof CUserMousePosMessage) {
+      if (message.isMessageOf(CUserMousePosMessage)) {
         setMice((mice) => {
           const mouse = mice.find((m) => m.userId === message.payload.userId);
           if (!mouse) {
@@ -71,7 +71,7 @@ export const MiceComponent = () => {
           }}
           className={styles.mouse}
         >
-            <p className={styles.username}>{mouse.username}</p>
+          <p className={styles.username}>{mouse.username}</p>
         </div>
       ))}
     </div>

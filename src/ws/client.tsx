@@ -1,10 +1,10 @@
 import { WSClient } from "@shared/ws-client.ts";
-import { JoinRoomMessage } from "@shared/message/serverbound/join-room-message.js";
+import { SJoinRoomMessage } from "@shared/message/serverbound/join-room-message.server.js";
 import WebSocket from "isomorphic-ws";
-import { JoinRoomResponseMessage } from "@shared/message/clientbound/join-room-response-message.ts";
+import { CJoinRoomResponseMessage } from "@shared/message/clientbound/join-room-response-message.client";
 import { MessageRegistry } from "@shared/message-registry.js";
 import EventEmitter from "eventemitter3";
-import { KickMessage } from "@shared/message/clientbound/kick-message.js";
+import { CKickMessage } from "@shared/message/clientbound/kick-message.client.js";
 import type { Message } from "@shared/message.ts";
 
 type Events = {
@@ -36,8 +36,8 @@ export class Client extends EventEmitter<Events> {
   }
 
   handleMessage(message: Message) {
-    console.log(message, message instanceof JoinRoomResponseMessage);
-    if (message instanceof JoinRoomResponseMessage) {
+    console.log(message, message.isMessageOf(CJoinRoomResponseMessage));
+    if (message.isMessageOf(CJoinRoomResponseMessage)) {
       if (!message.payload.success) {
         alert(message.payload.error);
         return;
@@ -45,7 +45,7 @@ export class Client extends EventEmitter<Events> {
 
       // Joined room
       this.emit("join", message.payload.code);
-    } else if (message instanceof KickMessage) {
+    } else if (message.isMessageOf(CKickMessage)) {
       this.onKick(message.payload.reason);
     }
   }
@@ -60,7 +60,7 @@ export class Client extends EventEmitter<Events> {
     this.socket.on("open", () => {
       this.emit("open");
       this.socket?.send(
-        MessageRegistry.buildMessage(JoinRoomMessage, {
+        MessageRegistry.buildMessage(SJoinRoomMessage, {
           username,
         })
       );
@@ -84,7 +84,7 @@ export class Client extends EventEmitter<Events> {
     this.socket.on("open", () => {
       this.emit("open");
       this.socket?.send(
-        MessageRegistry.buildMessage(JoinRoomMessage, {
+        MessageRegistry.buildMessage(SJoinRoomMessage, {
           username,
         })
       );

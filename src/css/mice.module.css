@@ -4,8 +4,10 @@
   width: 8px;
   height: 8px;
   background-color: rgba(0, 0, 0, 0.735);
+  color: rgba(0, 0, 0, 0.735);
   transform: translate(-50%, -50%);
   border-radius: 50%;
+  pointer-events: none;
 }
 
 .username {

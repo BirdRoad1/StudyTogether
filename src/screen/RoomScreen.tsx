@@ -5,6 +5,8 @@ import { useContext, useEffect, useState } from "react";
 import { ClientContext } from "../context/ClientContext.ts";
 import { StickyBoard } from "../component/sticky-board-component.tsx";
 import { MiceComponent } from "../component/mice-component.tsx";
+import { LLMChat } from "../component/llm-chat-component.tsx";
+import { Notepad } from "../component/notepad.tsx";
 
 export const RoomScreen = () => {
   const { roomCode } = useParams() as { roomCode: string };
@@ -26,6 +28,18 @@ export const RoomScreen = () => {
     }
   }, [client, roomCode, search]);
 
+  useEffect(() => {
+    const unloadEvent = (ev: BeforeUnloadEvent) => {
+      ev.preventDefault();
+    };
+
+    window.addEventListener("beforeunload", unloadEvent);
+
+    return () => {
+      window.removeEventListener("beforeunload", unloadEvent);
+    };
+  }, []);
+
   return (
     <div className={styles.room}>
       <div className={styles.header}>
@@ -43,7 +57,9 @@ export const RoomScreen = () => {
       <div className={styles.horizontal}>
         <Whiteboard />
         <StickyBoard createStickySignal={createStickySignal} />
+        <Notepad />
         <MiceComponent />
+        <LLMChat />
       </div>
     </div>
   );

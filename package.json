@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently --names 'api,vite' 'tsx --tsconfig tsconfig.server.json --watch server/index.ts' 'vite'",
-    "build": "rm -rf dist && tsc -b && tsc-alias -p tsconfig.server.json && vite build",
+    "build": "rm -rf dist && tsc -b && tsc-alias -p tsconfig.server.json && vite build && cp package.json dist/",
     "lint": "eslint .",
     "preview": "vite preview"
   },

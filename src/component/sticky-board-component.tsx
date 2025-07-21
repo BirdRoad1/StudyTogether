@@ -3,14 +3,13 @@ import { ClientContext } from "../context/ClientContext.ts";
 import type { StickyNote } from "@shared/model/sticky-note.ts";
 import { StickyNoteComponent } from "./sticky-note-component.tsx";
 import { MessageRegistry } from "@shared/message-registry.ts";
-import { EditStickyNoteMessage } from "@shared/message/serverbound/edit-sticky-note-message.ts";
-import { AddStickyMessage } from "@shared/message/clientbound/add-sticky-message.ts";
-import { ApproveStickyMessage } from "@shared/message/clientbound/approve-sticky-message.ts";
-import { EditStickyMessage } from "@shared/message/clientbound/edit-sticky-message.ts";
-import { CreateStickyNoteMessage } from "@shared/message/serverbound/create-sticky-note-message.ts";
+import { SEditStickyNoteMessage } from "@shared/message/serverbound/edit-sticky-note-message.server.ts";
+import { CAddStickyMessage } from "@shared/message/clientbound/add-sticky-message.client.ts";
+import { CApproveStickyMessage } from "@shared/message/clientbound/approve-sticky-message.client.ts";
+import { CEditStickyMessage } from "@shared/message/clientbound/edit-sticky-message.client.ts";
+import { SCreateStickyNoteMessage } from "@shared/message/serverbound/create-sticky-note-message.server.ts";
 import type { Message } from "@shared/message.ts";
-import { RemoveStickyNoteMessage } from "@shared/message/serverbound/remove-sticky-note-message.ts";
-import { CRemoveStickyNoteMessage } from "@shared/message/clientbound/remove-sticky-note-message.ts";
+import { SRemoveStickyNoteMessage } from "@shared/message/serverbound/remove-sticky-note-message.server.ts";
 
 type Props = { createStickySignal: number };
 
@@ -31,7 +30,7 @@ export const StickyBoard = ({ createStickySignal }: Props) => {
       setStickies((old) => [...old, sticky]);
 
       client?.socket?.send(
-        MessageRegistry.buildMessage(CreateStickyNoteMessage, {
+        MessageRegistry.buildMessage(SCreateStickyNoteMessage, {
           sticky,
         })
       );
@@ -44,11 +43,9 @@ export const StickyBoard = ({ createStickySignal }: Props) => {
     if (!client) return;
 
     const msgHandler = (message: Message) => {
-      if (message instanceof AddStickyMessage) {
-        console.log("Add a sticky");
+      if (message.isMessageOf(CAddStickyMessage)) {
         setStickies((old) => [...old, message.payload.sticky]);
-      } else if (message instanceof ApproveStickyMessage) {
-        console.log("Sticky approved");
+      } else if (message.isMessageOf(CApproveStickyMessage)) {
         setStickies((old) => {
           const sticky = old.find((s) => message.payload.clientId === s.id);
           const otherStickies = old.filter((s) => s != sticky);
@@ -58,7 +55,7 @@ export const StickyBoard = ({ createStickySignal }: Props) => {
 
           return [...otherStickies, copy];
         });
-      } else if (message instanceof EditStickyMessage) {
+      } else if (message.isMessageOf(CEditStickyMessage)) {
         setStickies((old) => {
           const sticky = old.find((s) => s.id === message.payload.sticky.id);
           if (!sticky) return old;
@@ -85,7 +82,7 @@ export const StickyBoard = ({ createStickySignal }: Props) => {
 
           return old.map((old) => (old.id === sticky.id ? copy : old));
         });
-      } else if (message instanceof CRemoveStickyNoteMessage) {
+      } else if (message.isMessageOf(SRemoveStickyNoteMessage)) {
         setStickies((old) => {
           return old.filter((sticky) => sticky.id !== message.payload.serverId);
         });
@@ -112,14 +109,14 @@ export const StickyBoard = ({ createStickySignal }: Props) => {
           sticky={s}
           onChange={(title, desc, x, y) => {
             client?.socket?.send(
-              MessageRegistry.buildMessage(EditStickyNoteMessage, {
+              MessageRegistry.buildMessage(SEditStickyNoteMessage, {
                 sticky: { id: s.id, title, desc, x, y },
               })
             );
           }}
           onRemove={() => {
             client?.socket?.send(
-              MessageRegistry.buildMessage(RemoveStickyNoteMessage, {
+              MessageRegistry.buildMessage(SRemoveStickyNoteMessage, {
                 serverId: s.id,
               })
             );

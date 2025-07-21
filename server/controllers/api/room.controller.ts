@@ -2,7 +2,7 @@ import { RoomManager } from "../../services/RoomManager.js";
 import type { WSRequestHandler } from "websocket-express";
 import { WSClient } from "@shared/ws-client.js";
 import { MessageRegistry } from "@shared/message-registry.js";
-import { KickMessage } from "@shared/message/clientbound/kick-message.js";
+import { CKickMessage } from "@shared/message/clientbound/kick-message.client.js";
 
 export const wsCreateRoom: WSRequestHandler = async (req, res) => {
   const ws = await res.accept();
@@ -20,7 +20,7 @@ export const wsJoinRoom: WSRequestHandler = async (req, res) => {
 
   if (!("code" in req.query) || typeof req.query.code !== "string") {
     client.send(
-      MessageRegistry.buildMessage(KickMessage, {
+      MessageRegistry.buildMessage(CKickMessage, {
         reason: "Room code missing",
       })
     );
@@ -33,7 +33,7 @@ export const wsJoinRoom: WSRequestHandler = async (req, res) => {
   const room = RoomManager.getRoomByCode(req.query.code);
   if (!room) {
     client.send(
-      MessageRegistry.buildMessage(KickMessage, {
+      MessageRegistry.buildMessage(CKickMessage, {
         reason: "Room not found",
       })
     );

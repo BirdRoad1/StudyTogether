@@ -4,9 +4,9 @@ import { useParams } from "react-router";
 import styles from "../css/room.module.css";
 import type { LineSegment } from "@shared/model/line-segment.ts";
 import { MessageRegistry } from "@shared/message-registry.ts";
-import { RequestLineSegmentMessage } from "@shared/message/serverbound/request-line-segment.ts";
-import { AddLineSegmentMessage } from "@shared/message/clientbound/add-line-segment-message.ts";
-import { RemoveLineSegmentMessage } from "@shared/message/clientbound/remove-line-segment-message.ts";
+import { SRequestLineSegmentMessage } from "@shared/message/serverbound/request-line-segment.server.ts";
+import { CAddLineSegmentMessage } from "@shared/message/clientbound/add-line-segment-message.client.ts";
+import { CRemoveLineSegmentMessage } from "@shared/message/clientbound/remove-line-segment-message.client.ts";
 import type { Message } from "@shared/message.ts";
 
 const MIN_MOVE_DISTANCE = 5;
@@ -73,7 +73,7 @@ export const Whiteboard = () => {
       }
 
       const msgHandler = (message: Message) => {
-        if (message instanceof AddLineSegmentMessage) {
+        if (message.isMessageOf(CAddLineSegmentMessage)) {
           const payload = message.payload;
           for (const seg of payload.segments) {
             if (seg.type === "client") {
@@ -96,7 +96,7 @@ export const Whiteboard = () => {
               ]);
             }
           }
-        } else if (message instanceof RemoveLineSegmentMessage) {
+        } else if (message.isMessageOf(CRemoveLineSegmentMessage)) {
           if (message.payload.type === "client") {
             // Remove client
             setLineSegments((seg) => {
@@ -168,7 +168,7 @@ export const Whiteboard = () => {
         };
 
         client?.socket?.send(
-          MessageRegistry.buildMessage(RequestLineSegmentMessage, {
+          MessageRegistry.buildMessage(SRequestLineSegmentMessage, {
             segment: seg,
           })
         );

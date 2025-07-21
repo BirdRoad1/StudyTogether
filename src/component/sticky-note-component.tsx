@@ -54,9 +54,10 @@ export const StickyNoteComponent = ({ sticky, onChange, onRemove }: Props) => {
   }, [desc, mouseX, mouseY, onChange, stickyX, stickyY, title]);
 
   useEffect(() => {
+    if (mouseDown) return;
     setStickyX(sticky.x);
     setStickyY(sticky.y);
-  }, [sticky.x, sticky.y]);
+  }, [sticky.x, sticky.y, mouseDown]);
 
   useEffect(() => {
     setTitle(sticky.title);
@@ -72,7 +73,6 @@ export const StickyNoteComponent = ({ sticky, onChange, onRemove }: Props) => {
       style={{
         left: stickyX,
         top: stickyY,
-        // zIndex,
       }}
       ref={stickyRef}
     >
