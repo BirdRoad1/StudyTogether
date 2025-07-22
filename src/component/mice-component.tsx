@@ -6,8 +6,14 @@ import { CUserMousePosMessage } from "@shared/message/clientbound/user-mouse-pos
 import { SUserMousePosMessage } from "@shared/message/serverbound/user-mouse-pos-message.server.ts";
 import styles from "../css/mice.module.css";
 import { client } from "../ws/client.tsx";
+import type { User } from "@shared/model/user.ts";
 
-export const MiceComponent = () => {
+type Props = {
+  users: User[];
+  visible: boolean;
+};
+
+export const MiceComponent = ({ users, visible }: Props) => {
   const [mice, setMice] = useState<Mouse[]>([]);
 
   useEffect(() => {
@@ -38,8 +44,10 @@ export const MiceComponent = () => {
             return [...mice, newMouse];
           }
 
+          // Create mouse copy with new data
           const mouseCopy = { ...mouse, ...message.payload };
 
+          // Replace old mouse with new mouse
           return mice.map((old) =>
             old.userId === message.payload.userId ? mouseCopy : old
           );
@@ -59,8 +67,23 @@ export const MiceComponent = () => {
     };
   }, []);
 
+  useEffect(() => {
+    setMice((old) => {
+      console.log(
+        "pre- mice:",
+        old,
+        users,
+        old.filter((mouse) => users.some((u) => u.id === mouse.userId))
+      );
+      return old.filter((mouse) => users.some((u) => u.id === mouse.userId));
+    });
+  }, [users]);
+
   return (
-    <div>
+    <div
+      className={styles.overlay}
+      style={{ visibility: visible ? "visible" : "hidden" }}
+    >
       {mice.map((mouse) => (
         <div
           key={mouse.userId}

@@ -103,10 +103,11 @@ export const StickyBoard = ({ createStickySignal }: Props) => {
 
   return (
     <div>
-      {stickies.map((s) => (
+      {stickies.map((s, index) => (
         <StickyNoteComponent
           key={s.id}
           sticky={s}
+          zIndex={index + 1}
           onChange={(title, desc, x, y) => {
             client?.socket?.send(
               MessageRegistry.buildMessage(SEditStickyNoteMessage, {

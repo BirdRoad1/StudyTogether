@@ -64,6 +64,7 @@ export const Notepad = () => {
           Personal
         </button>
       </div>
+      <button className={styles.copyBtn}>Copy</button>
       <textarea
         className={styles.notepad}
         placeholder="Enter your notes here..."

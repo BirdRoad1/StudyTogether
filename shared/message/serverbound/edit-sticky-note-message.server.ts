@@ -10,5 +10,5 @@ export const SEditStickyNoteMessage = createMessageClass("SEditStickyNoteMessage
       x: z.number(),
       y: z.number(),
     }),
-  })
+  }), "visitEditStickyNote"
 );

@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+
 .header {
   width: 100%;
   background-color: rgb(228, 228, 228);
@@ -6,36 +8,82 @@
   align-items: center;
   padding: 0 20px;
   font-family: "Roboto", sans-serif;
+  gap: 5px;
+}
+
+.code {
+  display: block;
+  background-color: white;
+  padding: 5px 8px;
+  border-radius: 4px;
+  backface-visibility: hidden;
+  transition: background-color 0.5s, color 0.5s;
+}
+
+.code:hover {
+  cursor: pointer;
+  background-color: rgb(151, 89, 210);
+  color: white;
 }
 
 .buttons {
-    background-color: rgb(178, 178, 178);
-    padding: 5px;
+  display: flex;
+  align-items: center;
+  background-color: rgb(196, 196, 196);
+  gap: 10px;
+  padding: 10px;
 }
 
 .buttons button {
-    width: 200px;
-    height: 35px;
-    background-color: rgb(74, 89, 132);
-    color: white;
-    border: none;
-    border-radius: 4px;
+  width: 200px;
+  height: 35px;
+  background-color: rgb(74, 89, 132);
+  color: white;
+  border: none;
+  border-radius: 4px;
+}
+
+.showCursors {
+  display: flex;
+  font-family: "Roboto", sans-serif;
+  gap: 5px;
+  align-items: center;
+}
+
+.usersCount {
+  display: block;
+  background-color: rgb(5, 170, 87);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  margin-left: auto;
+  font-family: "Roboto", sans-serif;
+  user-select: none;
+}
+
+.usersCount:hover {
+  cursor: pointer;
 }
 
 .horizontal {
-    display: flex;
-    padding: 20px 20px 0 20px;
-    gap: 10px;
+  display: flex;
+  justify-content: center;
+  padding: 20px 20px 0 20px;
+  gap: 10px;
 }
 
 .whiteboard {
-    display: block;
-    height: 750px;
-    width: 600px;
-    background-color: rgb(244, 244, 244);
-    border: 1px solid rgb(199, 199, 199);
+  display: block;
+  height: 750px;
+  width: 600px;
+  background-color: rgb(244, 244, 244);
+  border: 1px solid rgb(199, 199, 199);
 }
 
 .canvas {
-    cursor: none;
+  cursor: none;
+}
+
+.stickyNoteBtn{
+  cursor: pointer;
 }

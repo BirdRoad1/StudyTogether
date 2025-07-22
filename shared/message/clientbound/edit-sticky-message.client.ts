@@ -10,5 +10,5 @@ export const CEditStickyMessage = createMessageClass("CEditStickyMessage",
       x: z.number().optional(),
       y: z.number().optional(),
     }),
-  })
+  }),
 );

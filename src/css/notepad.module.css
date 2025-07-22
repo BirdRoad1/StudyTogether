@@ -24,7 +24,25 @@
   background-color: rgb(20, 20, 20);
 }
 
+.copyBtn {
+  position: absolute;
+  top: 40px;
+  right: 5px;
+  background-color: black;
+  border-radius: 4px;
+  color: white;
+  border: none;
+  padding: 7px 15px;
+  transition: background-color .3s;
+}
+
+.copyBtn:hover {
+  cursor: pointer;
+  background-color: rgb(21, 21, 21);
+}
+
 .notepadContainer {
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 600px;

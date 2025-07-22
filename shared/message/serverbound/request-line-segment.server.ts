@@ -12,5 +12,5 @@ export const SRequestLineSegmentMessage = createMessageClass("SRequestLineSegmen
       endX: z.number().transform(round),
       endY: z.number().transform(round),
     }),
-  })
+  }), "visitRequestLineSegment"
 );

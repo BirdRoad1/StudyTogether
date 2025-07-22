@@ -6,8 +6,9 @@ import type { LLMMessage } from "@shared/model/llm-message.ts";
 import { CLLMChatCompleteMessage } from "@shared/message/clientbound/llm-chat-complete-message.client.ts";
 import { client } from "../ws/client.tsx";
 
-export const LLMChat = () => {
+type Props = { showToolResponses: boolean };
 
+export const LLMChat = ({ showToolResponses }: Props) => {
   const [isShared, setIsShared] = useState(true);
   const [sharedMessages, setSharedMessages] = useState<LLMMessage[]>([]);
   const [personalMessages, setPersonalMessages] = useState<LLMMessage[]>([]);
@@ -17,7 +18,6 @@ export const LLMChat = () => {
   const onBtnClick = useCallback(() => {
     if (!inputText) return;
     const type = isShared ? "shared" : "personal";
-
     setInputText("");
     client?.socket?.send(
       MessageRegistry.buildMessage(SSendLLMMessage, {
@@ -31,16 +31,16 @@ export const LLMChat = () => {
     if (isShared) {
       messagesDivRef.current?.scroll({
         top: messagesDivRef.current?.scrollHeight,
-        behavior: "smooth"
+        behavior: "smooth",
       });
     }
   }, [sharedMessages, isShared]);
-  
+
   useEffect(() => {
     if (!isShared) {
       messagesDivRef.current?.scroll({
         top: messagesDivRef.current?.scrollHeight,
-        behavior: "smooth"
+        behavior: "smooth",
       });
     }
   }, [personalMessages, isShared]);
@@ -70,6 +70,23 @@ export const LLMChat = () => {
     console.log(isShared);
   }, [isShared]);
 
+  const removeToolsFromMessage = (msg: string) => {
+    if (showToolResponses) return msg;
+
+    const chunks = [];
+    const split = msg.split("");
+    for (const part of split) {
+      try {
+        JSON.parse(part);
+      } catch {
+        // Only push invalid chunks
+        chunks.push(part.trim());
+      }
+    }
+
+    return chunks.join("\n");
+  };
+
   return (
     <div className={styles.chat}>
       <div className={styles.tabs}>
@@ -91,6 +108,10 @@ export const LLMChat = () => {
       )}
       <div className={styles.messages} ref={messagesDivRef}>
         {(isShared ? sharedMessages : personalMessages).map((m) => {
+          if (!showToolResponses && m.message.startsWith("Tool Response:")) {
+            return <></>;
+          }
+
           return (
             <div className={styles.message} key={m.id}>
               <p className={styles.author}>
@@ -100,10 +121,12 @@ export const LLMChat = () => {
                   ? "You"
                   : m.message.split(": ").shift()}
               </p>
-              <p>
-                {m.role === "user" && m.type === "shared"
-                  ? m.message.split(": ").splice(1)
-                  : m.message}
+              <p className={styles.content}>
+                {removeToolsFromMessage(
+                  m.role === "user"
+                    ? m.message.split(": ").splice(1).join(": ")
+                    : m.message
+                )}
               </p>
             </div>
           );

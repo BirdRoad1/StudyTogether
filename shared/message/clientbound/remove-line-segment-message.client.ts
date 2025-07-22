@@ -7,5 +7,5 @@ export const CRemoveLineSegmentMessage = createMessageClass("CRemoveLineSegmentM
       type: z.enum(["client", "server"]),
       id: z.uuid(),
     }),
-  ])
+  ]),
 );

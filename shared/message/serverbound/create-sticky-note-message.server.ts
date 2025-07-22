@@ -10,5 +10,6 @@ export const SCreateStickyNoteMessage = createMessageClass("SCreateStickyNoteMes
       x: z.number(),
       y: z.number(),
     }),
-  })
+  }),
+  "visitCreateStickyNote"
 );

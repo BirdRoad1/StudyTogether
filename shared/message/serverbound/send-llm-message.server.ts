@@ -8,5 +8,5 @@ export const SSendLLMMessage = createMessageClass("SSendLLMMessage",
       .min(1)
       .max(4096 * 6), // 6 tokens per char max?
     type: z.enum(["shared", "personal"]),
-  })
+  }),"visitSendLLM"
 );

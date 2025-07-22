@@ -15,5 +15,5 @@ export const CJoinRoomResponseMessage = createMessageClass("CJoinRoomResponseMes
         error: z.string(),
       })
       .strict(),
-  ])
+  ]),
 );

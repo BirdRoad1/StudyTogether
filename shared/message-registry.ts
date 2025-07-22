@@ -18,6 +18,7 @@ import { SSendLLMMessage } from "@shared/message/serverbound/send-llm-message.se
 import { CLLMChatCompleteMessage } from "@shared/message/clientbound/llm-chat-complete-message.client.js";
 import { SEditNotesMessage } from "@shared/message/serverbound/edit-notes-message.server.js";
 import { CEditNotesMessage } from "@shared/message/clientbound/edit-notes-message.client.js";
+import { CUsersListMessage } from "@shared/message/clientbound/users-list-message.client.js";
 
 export type MessageType = "join";
 
@@ -55,6 +56,7 @@ export class MessageRegistry {
     this.registerMessageType(18, CLLMChatCompleteMessage);
     this.registerMessageType(19, SEditNotesMessage);
     this.registerMessageType(20, CEditNotesMessage);
+    this.registerMessageType(21, CUsersListMessage);
   }
 
   static registerMessageType(id: number, ctor: MessageConstructor) {

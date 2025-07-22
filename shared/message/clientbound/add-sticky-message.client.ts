@@ -1,7 +1,8 @@
 import z from "zod";
 import { createMessageClass } from "@shared/typed-message.js";
 
-export const CAddStickyMessage = createMessageClass("CAddStickyMessage",
+export const CAddStickyMessage = createMessageClass(
+  "CAddStickyMessage",
   z.object({
     sticky: z.object({
       id: z.string(),
@@ -10,5 +11,5 @@ export const CAddStickyMessage = createMessageClass("CAddStickyMessage",
       x: z.number(),
       y: z.number(),
     }),
-  })
+  }),
 );

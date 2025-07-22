@@ -7,5 +7,5 @@ export const CUserMousePosMessage = createMessageClass("CUserMousePosMessage",
     y: z.number(),
     userId: z.string(),
     username: z.string(),
-  })
+  }),
 );

@@ -22,16 +22,17 @@ function App() {
   return (
     <div className={styles.content}>
       <h1>GroupStudy</h1>
+      <p className={styles.tagLine}>A collaborative, all-in-one study space</p>
       <input
         type="text"
         className={styles.username}
-        placeholder="Username"
+        placeholder="Enter a username"
         onChange={(ev) => {
           setUsername(ev.target.value);
         }}
       />
       <div className={styles.btns}>
-        <button onClick={() => createRoomClicked()}>Create Room</button>
+        <button onClick={() => createRoomClicked()} className={styles.createBtn}>Create Room</button>
         <button
           onClick={() => {
             const code = prompt("Enter room code");
@@ -41,6 +42,7 @@ function App() {
             }
             location.href = "/room/" + code + "?username=" + username;
           }}
+          className={styles.joinBtn}
         >
           Join Room
         </button>

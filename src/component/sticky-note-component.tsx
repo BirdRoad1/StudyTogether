@@ -4,11 +4,12 @@ import type { StickyNote } from "@shared/model/sticky-note.ts";
 
 type Props = {
   sticky: StickyNote;
+  zIndex?: number;
   onChange?: (title: string, desc: string, x: number, y: number) => void;
   onRemove?: () => void;
 };
 
-export const StickyNoteComponent = ({ sticky, onChange, onRemove }: Props) => {
+export const StickyNoteComponent = ({ sticky, onChange, onRemove,zIndex }: Props) => {
   const [mouseDown, setMouseDown] = useState(false);
   const [mouseX, setMouseX] = useState(0);
   const [mouseY, setMouseY] = useState(0);
@@ -76,6 +77,7 @@ export const StickyNoteComponent = ({ sticky, onChange, onRemove }: Props) => {
       style={{
         left: stickyX,
         top: stickyY,
+        zIndex,
       }}
       ref={stickyRef}
     >

@@ -6,5 +6,5 @@ export const CEditNotesMessage = createMessageClass(
   z.object({
     type: z.enum(["shared", "personal"]),
     content: z.string(),
-  })
+  }),
 );

@@ -13,5 +13,5 @@ export const CLLMChatCompleteMessage = createMessageClass(
         role: z.enum(["system", "user", "assistant"]),
       })
     ),
-  })
+  }),
 );
